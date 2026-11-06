@@ -1,0 +1,13 @@
+{
+  "__TypeId": "ca028d68-85a9-5f3d-ad2f-c54db757d6fa",
+  "Id": "db819636-7469-4118-9d52-a338245b4d4a",
+  "Name": "Turian.Audio.Miniaudio",
+  "RootNamespace": "Turian.Audio.Miniaudio",
+  "EditorOnly": false,
+  "AllowUnsafeCode": true,
+  "References": [
+    {
+      "AssetId": "9b16cdaa-e425-46e0-b856-187ea33a134b"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "org.mass4.turian.audio.miniaudio",
+  "version": "1.0.0",
+  "displayName": "miniaudio",
+  "description": "Native audio devices and WAV decoding.",
+  "author": "MASS4",
+  "license": "MPL-2.0",
+  "clientOnly": true,
+  "categories": ["turian:audio"],
+  "keywords": ["audio", "miniaudio", "native", "device"],
+  "dependencies": {
+    "org.mass4.turian.audio": "^1.0.0"
+  },
+  "roles": {
+    "source": [
+      "Brick~/Source",
+      "Brick~/Native"
+    ],
+    "tests": "Brick~/Tests",
+    "precast": "Brick~/Precast",
+    "bake": "Brick~/Bake"
+  },
+  "exclude": [
+    "Brick~/Tests",
+    ".github",
+    ".gitignore",
+    ".local",
+    ".script-*.py",
+    ".script-*.cs",
+    ".script-*.sh",
+    ".script-*.ps1"
+  ],
+  "bake": "auto"
+}

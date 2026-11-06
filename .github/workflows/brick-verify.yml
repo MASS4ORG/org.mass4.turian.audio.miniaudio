@@ -1,0 +1,45 @@
+name: Verify brick
+on: {push: {branches: [main]}, pull_request: {}}
+permissions: {contents: read}
+jobs:
+  verify:
+    uses: MASS4ORG/brick-workflows/.github/workflows/verify.yml@v1
+    with:
+      source-test-dependency: '{"repository":"MASS4ORG/org.mass4.turian.audio","ref":"v1.0.0","path":"org.mass4.turian.audio"}'
+      source-tests: Brick~/Tests/Turian.Audio.Miniaudio.Tests/Turian.Audio.Miniaudio.Tests.csproj
+  native:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2025, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install C compiler on Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -yqq && sudo apt-get install -yqq build-essential
+      - name: Install C compiler on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (-not (Get-Command gcc -ErrorAction SilentlyContinue)) {
+            choco install mingw --no-progress -y
+            if ($LASTEXITCODE -ne 0) { throw 'C compiler installation failed.' }
+            $env:PATH = [Environment]::GetEnvironmentVariable('PATH', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('PATH', 'User') + ';' + $env:PATH
+          }
+          $compiler = Get-Command gcc -ErrorAction Stop
+          Split-Path -Parent $compiler.Source | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+      - name: Verify Apple C toolchain
+        if: runner.os == 'macOS'
+        run: xcrun --find clang
+      - name: Compile native shim on Linux
+        if: runner.os == 'Linux'
+        working-directory: Brick~/Native
+        run: cc -O2 -shared -fPIC turian_audio.c -o libturian_audio.so -ldl -lpthread -lm
+      - name: Compile native shim on Windows
+        if: runner.os == 'Windows'
+        working-directory: Brick~/Native
+        run: gcc -O2 -shared -static-libgcc turian_audio.c -o turian_audio.dll -lwinmm -lole32
+      - name: Compile native shim on macOS
+        if: runner.os == 'macOS'
+        working-directory: Brick~/Native
+        run: cc -O2 -dynamiclib -fPIC turian_audio.c -o libturian_audio.dylib -framework CoreFoundation -framework CoreAudio -framework AudioToolbox

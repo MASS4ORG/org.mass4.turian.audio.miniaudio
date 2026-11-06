@@ -1,0 +1,30 @@
+<Project>
+  <PropertyGroup>
+    <AudioNativeName Condition="$([MSBuild]::IsOSPlatform('Windows'))">turian_audio.dll</AudioNativeName>
+    <AudioNativeName Condition="$([MSBuild]::IsOSPlatform('Linux'))">libturian_audio.so</AudioNativeName>
+    <AudioNativeName Condition="$([MSBuild]::IsOSPlatform('OSX'))">libturian_audio.dylib</AudioNativeName>
+    <AudioCCompiler Condition="'$(AudioCCompiler)' == '' And $([MSBuild]::IsOSPlatform('Windows'))">gcc</AudioCCompiler>
+    <AudioCCompiler Condition="'$(AudioCCompiler)' == ''">cc</AudioCCompiler>
+    <AudioNativeFlags Condition="$([MSBuild]::IsOSPlatform('Windows'))">-shared -static-libgcc -lwinmm -lole32</AudioNativeFlags>
+    <AudioNativeFlags Condition="$([MSBuild]::IsOSPlatform('Linux'))">-shared -fPIC -ldl -lpthread -lm</AudioNativeFlags>
+    <AudioNativeFlags Condition="$([MSBuild]::IsOSPlatform('OSX'))">-dynamiclib -fPIC -framework CoreFoundation -framework CoreAudio -framework AudioToolbox</AudioNativeFlags>
+    <AudioNativeArchitectureFlags Condition="$([MSBuild]::IsOSPlatform('OSX')) And '$(RuntimeIdentifier)' == 'osx-x64'">-arch x86_64</AudioNativeArchitectureFlags>
+    <AudioNativeArchitectureFlags Condition="$([MSBuild]::IsOSPlatform('OSX')) And '$(RuntimeIdentifier)' == 'osx-arm64'">-arch arm64</AudioNativeArchitectureFlags>
+    <AudioNativeOutput>$(MSBuildProjectDirectory)/obj/audio/$(RuntimeIdentifier)/$(AudioNativeName)</AudioNativeOutput>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(AudioNativeName)' != ''">
+    <None Include="$(AudioNativeOutput)" Link="$(AudioNativeName)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"
+          ExcludeFromSingleFile="true" Pack="true" PackagePath="runtimes/$(NETCoreSdkRuntimeIdentifier)/native/$(AudioNativeName)" />
+
+  </ItemGroup>
+  <Target Name="BuildAudioNative" BeforeTargets="PrepareForBuild" Condition="'$(AudioNativeName)' != ''"
+          Inputs="$(MSBuildThisFileDirectory)turian_audio.c;$(MSBuildThisFileDirectory)miniaudio.h;$(MSBuildThisFileFullPath)"
+          Outputs="$(AudioNativeOutput)">
+    <MakeDir Directories="$(MSBuildProjectDirectory)/obj/audio/$(RuntimeIdentifier)" />
+    <Exec Command="&quot;$(AudioCCompiler)&quot; -O2 -fvisibility=hidden $(AudioNativeArchitectureFlags) &quot;$(MSBuildThisFileDirectory)turian_audio.c&quot; -o &quot;$(AudioNativeOutput)&quot; $(AudioNativeFlags)" />
+  </Target>
+  <Target Name="StageBrickNativeRuntime" AfterTargets="Build" Condition="'$(AudioNativeName)' != ''">
+    <Copy SourceFiles="$(AudioNativeOutput)"
+          DestinationFolder="$(MSBuildProjectDirectory)/../../../Brick~/Precast/lib/runtimes/$(NETCoreSdkRuntimeIdentifier)/native" />
+  </Target>
+</Project>
