@@ -9,7 +9,7 @@ public sealed class MiniaudioModule : IEngineServiceModule
     /// <inheritdoc/>
     public void ConfigureServices(IServiceCollection services)
     {
-        if (!services.GetEngineSession().Interactive) { return; }
+        if (!services.GetApplicationContext().Interactive) { return; }
         services.AddSingleton<IAudioDevice, MiniaudioDevice>();
         services.AddSingleton<IAudioCodec, MiniaudioCodec>();
     }
