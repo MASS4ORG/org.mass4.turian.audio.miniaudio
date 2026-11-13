@@ -5,7 +5,7 @@ jobs:
   release:
     uses: MASS4ORG/brick-workflows/.github/workflows/release.yml@v1
     with:
-      source-test-dependency: '{"repository":"MASS4ORG/org.mass4.turian.audio","ref":"v1.0.0","path":"org.mass4.turian.audio"}'
+      source-test-dependency: '{"repository":"MASS4ORG/org.mass4.turian.audio","ref":"v1.1.0","path":"org.mass4.turian.audio"}'
       source-tests: Brick~/Tests/Turian.Audio.Miniaudio.Tests/Turian.Audio.Miniaudio.Tests.csproj
     secrets:
       BRICKS_SIGNING_KEY: ${{ secrets.BRICKS_SIGNING_KEY }}
