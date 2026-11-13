@@ -2,11 +2,9 @@
 
 ## [Unreleased]
 
-## [1.2.0]
+## [1.1.1] - 2026-11-13
 
-- Fixed: works with Turian 4+.
-
-## [1.1.0]
+- Added: Android arm64 and x64 native libraries.
 
 ## [1.0.0]
 
